@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive SAP Pillars</title>
+<style>
+  :root{
+    --orange:#f37832;
+    --plum:#a45173;
+    --yellow:#ebb33f;
+    --olive:#aaa14e;
+    --navy:#17396b;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#ffffff;
+    font-family:"Segoe UI",Arial,sans-serif;
+    padding:28px;
+    color:#fff;
+  }
+  .animation{
+    width:min(1360px,100%);
+  }
+  .instruction{
+    color:#17396b;
+    font-size:14px;
+    font-weight:600;
+    margin:0 0 14px 2px;
+    opacity:.78;
+  }
+  .pillars{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    min-height:570px;
+    align-items:stretch;
+  }
+  .pillar{
+    --color:var(--orange);
+    position:relative;
+    border:0;
+    border-radius:0;
+    min-width:0;
+    padding:0;
+    color:#fff;
+    background:var(--color);
+    text-align:left;
+    font:inherit;
+    cursor:pointer;
+    overflow:hidden;
+    isolation:isolate;
+    outline:none;
+    box-shadow:0 9px 22px rgba(27,30,55,.09);
+    transition:transform .28s ease,box-shadow .28s ease,filter .28s ease;
+  }
+  .pillar:nth-child(1){--color:var(--orange)}
+  .pillar:nth-child(2){--color:var(--plum)}
+  .pillar:nth-child(3){--color:var(--yellow)}
+  .pillar:nth-child(4){--color:var(--olive)}
+  .pillar:hover{
+    transform:translateY(-6px);
+    box-shadow:0 18px 38px rgba(27,30,55,.18);
+    filter:saturate(1.04);
+  }
+  .pillar:focus-visible{
+    box-shadow:0 0 0 4px #fff,0 0 0 7px var(--navy),0 18px 38px rgba(27,30,55,.18);
+  }
+  .pillar::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    background:linear-gradient(145deg,rgba(255,255,255,.08),transparent 47%,rgba(0,0,0,.05));
+  }
+  .pillar::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:5px;
+    background:rgba(255,255,255,.82);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .42s cubic-bezier(.2,.8,.2,1);
+  }
+  .pillar.active::after{transform:scaleX(1)}
+  .notch{
+    position:absolute;
+    left:-1px;
+    top:150px;
+    width:29px;
+    height:58px;
+    border-radius:0 32px 32px 0;
+    background:#fff;
+    z-index:3;
+  }
+  .pillar-inner{
+    padding:42px 40px 34px 52px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+  }
+  .icon{
+    height:72px;
+    width:72px;
+    margin-bottom:24px;
+    flex:0 0 auto;
+    transition:transform .38s cubic-bezier(.2,.8,.2,1);
+  }
+  .pillar:hover .icon,
+  .pillar.active .icon{transform:scale(1.07) translateY(-3px)}
+  .icon svg{
+    width:100%;
+    height:100%;
+    fill:none;
+    stroke:#fff;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .pillar-title{
+    font-size:clamp(24px,2vw,34px);
+    line-height:1.22;
+    font-weight:750;
+    letter-spacing:-.018em;
+    text-wrap:balance;
+  }
+  .read-more{
+    margin-top:auto;
+    padding-top:28px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    font-weight:750;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    opacity:.82;
+    transition:opacity .25s ease;
+  }
+  .plus{
+    display:grid;
+    place-items:center;
+    width:24px;
+    height:24px;
+    border:1.5px solid currentColor;
+    border-radius:50%;
+    font-size:19px;
+    font-weight:400;
+    line-height:1;
+    transition:transform .35s ease;
+  }
+  .pillar.active .plus{transform:rotate(45deg)}
+  .detail{
+    display:grid;
+    grid-template-rows:0fr;
+    opacity:0;
+    transition:grid-template-rows .46s cubic-bezier(.2,.8,.2,1),opacity .3s ease,margin-top .46s ease;
+  }
+  .detail-inner{overflow:hidden}
+  .detail p{
+    padding-top:0;
+    font-size:clamp(17px,1.28vw,22px);
+    line-height:1.35;
+    font-weight:430;
+  }
+  .detail strong{font-weight:780}
+  .pillar.active .detail{
+    grid-template-rows:1fr;
+    opacity:1;
+    margin-top:28px;
+  }
+  .pillar.active .detail p{padding-top:2px}
+  .pillar.active .read-more{opacity:.56}
+  @media(max-width:1050px){
+    body{align-items:flex-start}
+    .pillars{grid-template-columns:repeat(2,1fr);min-height:0}
+    .pillar{min-height:500px}
+  }
+  @media(max-width:640px){
+    body{padding:18px}
+    .pillars{grid-template-columns:1fr;gap:14px}
+    .pillar{min-height:0}
+    .pillar-inner{padding:30px 30px 28px 44px}
+    .notch{top:98px;width:23px;height:46px}
+    .icon{width:58px;height:58px;margin-bottom:18px}
+    .read-more{margin-top:30px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+<main class="animation">
+  <p class="instruction">Click a pillar to read more</p>
+  <section class="pillars" aria-label="Four reasons for choosing SAP">
+    <button class="pillar" type="button" aria-expanded="false">
+      <span class="notch" aria-hidden="true"></span>
+      <span class="pillar-inner">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 80 80">
+            <path d="M40 4l6 6 8-2 3 8 8 3-2 8 6 6-6 6 2 8-8 3-3 8-8-2-6 6-6-6-8 2-3-8-8-3 2-8-6-6 6-6-2-8 8-3 3-8 8 2z"/>
+            <circle cx="40" cy="33" r="19"/>
+            <path d="M31 33l6 6 13-14"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Improved user experience</span>
+        <span class="detail">
+          <span class="detail-inner">
+            <p><strong>Allows</strong> individual <strong>customization</strong> and <strong>role-based access</strong> to applications through its user-friendly web interface: the <strong>FIORI launchpad.</strong></p>
+          </span>
+        </span>
+        <span class="read-more"><span class="plus">+</span><span>Read more</span></span>
+      </span>
+    </button>
+    <button class="pillar" type="button" aria-expanded="false">
+      <span class="notch" aria-hidden="true"></span>
+      <span class="pillar-inner">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 80 80">
+            <path d="M18 51h45a15 15 0 0 0 1-30 21 21 0 0 0-40-3A17 17 0 0 0 18 51z"/>
+            <path d="M40 67V30M29 41l11-11 11 11"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Harnessing the Power of Cloud Computing</span>
+        <span class="detail">
+          <span class="detail-inner">
+            <p><strong>Provides flexibility</strong> with access to applications and data from anywhere, <strong>scalability</strong> with regular upgrades, and <strong>cost efficiency</strong> with less investments in infrastructure.</p>
+          </span>
+        </span>
+        <span class="read-more"><span class="plus">+</span><span>Read more</span></span>
+      </span>
+    </button>
+    <button class="pillar" type="button" aria-expanded="false">
+      <span class="notch" aria-hidden="true"></span>
+      <span class="pillar-inner">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 80 80">
+            <circle cx="40" cy="37" r="32"/>
+            <circle cx="40" cy="37" r="26"/>
+            <path d="M40 20v17l11 11"/>
+            <path d="M40 12v2M40 60v2M15 37h2M63 37h2"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Access to Real-Time Data and Decision-Making</span>
+        <span class="detail">
+          <span class="detail-inner">
+            <p><strong>Improves data accuracy</strong> and provides business functions with a holistic view of operations, allowing <strong>business decisions based on reliable information in real time.</strong></p>
+          </span>
+        </span>
+        <span class="read-more"><span class="plus">+</span><span>Read more</span></span>
+      </span>
+    </button>
+    <button class="pillar" type="button" aria-expanded="false">
+      <span class="notch" aria-hidden="true"></span>
+      <span class="pillar-inner">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 80 80">
+            <ellipse cx="40" cy="14" rx="26" ry="9"/>
+            <path d="M14 14v47c0 5 12 9 26 9s26-4 26-9V14"/>
+            <path d="M14 30c0 5 12 9 26 9s26-4 26-9M14 46c0 5 12 9 26 9s26-4 26-9"/>
+            <circle cx="57" cy="27" r="1" fill="#fff" stroke="none"/>
+            <circle cx="57" cy="43" r="1" fill="#fff" stroke="none"/>
+            <circle cx="57" cy="59" r="1" fill="#fff" stroke="none"/>
+          </svg>
+        </span>
+        <span class="pillar-title">Seamless Data Integration</span>
+        <span class="detail">
+          <span class="detail-inner">
+            <p><strong>Integrates data</strong> across a diverse set of departments &amp; systems <strong>in a unique platform</strong> and facilitates real-time data sharing, with a single source of truth.</p>
+          </span>
+        </span>
+        <span class="read-more"><span class="plus">+</span><span>Read more</span></span>
+      </span>
+    </button>
+  </section>
+</main>
+<script>
+  const pillars = [...document.querySelectorAll('.pillar')];
+  pillars.forEach((pillar) => {
+    pillar.addEventListener('click', () => {
+      const opening = !pillar.classList.contains('active');
+      pillars.forEach((item) => {
+        item.classList.remove('active');
+        item.setAttribute('aria-expanded', 'false');
+        item.querySelector('.read-more span:last-child').textContent = 'Read more';
+      });
+      if (opening) {
+        pillar.classList.add('active');
+        pillar.setAttribute('aria-expanded', 'true');
+        pillar.querySelector('.read-more span:last-child').textContent = 'Close';
+      }
+    });
+  });
+</script>
+</body>
+</html>
